@@ -1,0 +1,20 @@
+name: 'BadDocs Analysis'
+description: 'Run BadDocs analysis on your repository'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+inputs:
+  repository:
+    description: 'Repository to analyze'
+    required: false
+    default: '.'
+  provider:
+    description: 'LLM provider to use'
+    required: false
+    default: 'anthropic'
+  output:
+    description: 'Output format'
+    required: false
+    default: 'json'

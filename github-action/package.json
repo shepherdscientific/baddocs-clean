@@ -1,0 +1,14 @@
+{
+  "name": "baddocs-action",
+  "version": "1.0.0",
+  "description": "BadDocs GitHub Action",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.0"
+  }
+}
