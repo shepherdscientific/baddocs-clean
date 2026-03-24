@@ -1,56 +1,32 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=65.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "baddocs"
 version = "1.0.0"
-description = "AI-powered documentation generation and analysis"
+description = "AI-powered documentation generation for legacy codebases"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
-authors = [{name = "BadDocs Contributors"}]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-]
+authors = [{name = "Shepherd Scientific"}]
+keywords = ["documentation", "legacy-code", "ai", "analysis"]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
-    "pytest-cov",
-    "black",
-    "flake8",
-    "mypy",
-    "isort",
-]
-docs = [
-    "mkdocs",
-    "mkdocs-material",
+    "pytest-cov>=4.0",
+    "pytest-asyncio>=0.20",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+    "isort>=5.0",
+    "pre-commit>=3.0",
 ]
 
-[project.scripts]
-baddocs = "baddocs.cli.main:cli"
-baddocs-server = "baddocs.web.main:run"
-
-[tool.black]
-line-length = 100
-target-version = ['py39']
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
+[tool.setuptools]
+packages = ["baddocs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=src --cov-report=html"
+addopts = "--cov=baddocs --cov-report=html --cov-report=term-missing"

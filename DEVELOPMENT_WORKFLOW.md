@@ -1,35 +1,51 @@
 # Development Workflow
 
-## Setting up Development Environment
+Guidelines for contributing to BadDocs.
+
+## Setup
+
+1. Fork the repository
+2. Clone your fork
+3. Create a feature branch: `git checkout -b feature/your-feature`
+4. Set up development environment: `make dev-setup`
+5. Install pre-commit hooks: `pre-commit install`
+
+## Development
+
+### Running Tests
 
 ```bash
-python -m venv venv
-source venv/bin/activate
-pip install -e ".[dev]"
+# All tests
+make test
+
+# Unit tests only
+make test-unit
+
+# Integration tests
+make test-integration
+
+# With coverage
+make test-coverage
 ```
 
-## Running Tests
+### Code Quality
 
 ```bash
-pytest
+# Format code
+make format
+
+# Lint code
+make lint
+
+# Type checking
+make typecheck
 ```
 
-## Running Tests with Coverage
+## Submitting Changes
 
-```bash
-pytest --cov=src
-```
-
-## Code Quality
-
-```bash
-black src/
-flake8 src/
-mypy src/
-```
-
-## Building Documentation
-
-```bash
-mkdocs serve
-```
+1. Ensure all tests pass
+2. Add new tests for new functionality
+3. Update documentation
+4. Commit with descriptive messages
+5. Push to your fork
+6. Create a pull request

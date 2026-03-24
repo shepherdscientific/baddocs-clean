@@ -1,19 +1,33 @@
-# Docker Testing
+# Docker Testing Guide
 
 ## Running Tests in Docker
+
+### Unit Tests
+
+```bash
+docker-compose -f docker-compose.test.yml run --rm test-unit
+```
+
+### Integration Tests
+
+```bash
+docker-compose -f docker-compose.test.yml run --rm test-integration
+```
+
+### All Tests
 
 ```bash
 docker-compose -f docker-compose.test.yml up
 ```
 
-## Running Specific Tests
+## Development Container
 
 ```bash
-docker exec baddocs pytest tests/unit/test_cli.py
+docker-compose -f docker-compose.dev.yml up
 ```
 
-## Debugging in Docker
-
-```bash
-docker exec -it baddocs /bin/bash
-```
+This starts a development environment with:
+- PostgreSQL database
+- Redis cache
+- BadDocs application
+- Hot-reload enabled

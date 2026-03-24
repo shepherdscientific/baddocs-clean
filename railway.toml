@@ -2,5 +2,5 @@
 builder = "nixpacks"
 
 [deploy]
-port = 8000
-restart_policy = "on_failure"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5

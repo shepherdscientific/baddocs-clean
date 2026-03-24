@@ -1,32 +1,47 @@
 version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://baddocs:baddocs@db:5432/baddocs
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - ./data:/data
 
+services:
   db:
     image: postgres:15
     environment:
       POSTGRES_USER: baddocs
       POSTGRES_PASSWORD: baddocs
       POSTGRES_DB: baddocs
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U baddocs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://baddocs:baddocs@db:5432/baddocs
+      REDIS_URL: redis://redis:6379/0
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
-      - redis_data:/data
+      - ./src:/app/src
 
 volumes:
   postgres_data:
-  redis_data:

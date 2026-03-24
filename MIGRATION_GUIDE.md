@@ -1,16 +1,29 @@
 # Migration Guide
 
-## From v0.x to v1.0
+## Upgrading to a New Version
 
-### Breaking Changes
+### From v0.x to v1.0
 
-1. Configuration file format has changed
-2. API endpoints have been updated
-3. Database schema has been migrated
+#### Database Migration
 
-### Migration Steps
+```bash
+# Backup current database
+pg_dump baddocs > backup.sql
 
-1. Back up your database
-2. Update configuration files
-3. Run database migrations: `alembic upgrade head`
-4. Restart the application
+# Run migrations
+python scripts/run_migrations.py
+
+# Verify migration
+python -c "from baddocs.storage import models; print(models.Document.__table__.columns.keys())"
+```
+
+#### Configuration Changes
+
+- Update `.env` with new variables
+- Review `config/providers.yml` for new providers
+- Update `pyproject.toml` dependencies
+
+#### API Changes
+
+- See `API_CHANGES.md` for endpoint modifications
+- Update integration code accordingly

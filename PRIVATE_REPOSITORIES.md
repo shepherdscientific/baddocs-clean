@@ -1,20 +1,28 @@
-# Private Repository Support
+# Working with Private Repositories
 
-## Accessing Private Repositories
+## GitHub Authentication
 
-### GitHub Token Setup
+### Personal Access Token
 
-1. Create a GitHub token with `repo` scope
-2. Set `GITHUB_TOKEN` environment variable
-3. BadDocs will automatically use the token for private repository access
+1. Generate token at https://github.com/settings/tokens
+2. Set environment variable: `GITHUB_TOKEN=your_token`
+3. BadDocs will automatically use this for private repository access
 
-### SSH Key Setup
+### SSH Keys
 
-1. Add your SSH key to the system
-2. BadDocs will use SSH URLs for repository cloning
+1. Add public key to GitHub account
+2. Configure SSH in git config
+3. BadDocs will use SSH URLs automatically
+
+## Private Repository Analysis
+
+```bash
+baddocs-cli analyze --repo https://github.com/user/private-repo
+```
 
 ## Security Considerations
 
-- Keep tokens secure
-- Use fine-grained tokens when possible
-- Regularly rotate credentials
+- Never commit credentials
+- Use environment variables or secret management
+- Rotate tokens regularly
+- Audit access logs
