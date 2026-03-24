@@ -1,0 +1,1 @@
+# Custom Patterns\n\nGuide for defining custom analysis patterns in BadDocs.\n
