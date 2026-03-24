@@ -1,3 +1,3 @@
-# OpenCode Integration
+# OpenCode Support
 
-OpenCode support in Ralph.
+BadDocs supports OpenCode patterns.
