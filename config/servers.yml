@@ -1,0 +1,7 @@
+servers:
+  core:
+    name: Core MCP Server
+    command: python -m src.baddocs.mcp_servers.core
+  database:
+    name: Database MCP Server
+    command: python -m src.baddocs.mcp_servers.database

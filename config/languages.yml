@@ -1,0 +1,10 @@
+languages:
+  python:
+    extensions: ['.py']
+    processor: 'src.baddocs.processors.python'
+  javascript:
+    extensions: ['.js', '.jsx', '.ts', '.tsx']
+    processor: 'src.baddocs.processors.javascript'
+  java:
+    extensions: ['.java']
+    processor: 'src.baddocs.processors.java'
