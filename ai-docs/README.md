@@ -1,0 +1,1 @@
+# AI Documentation\n\nAI-related documentation for BadDocs.\n
