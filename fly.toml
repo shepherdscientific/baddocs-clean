@@ -1,0 +1,21 @@
+# Fly deployment configuration
+app = "baddocs"
+primary_region = "sfo"
+
+[build]
+  builder = "heroku"
+  buildpacks = ["heroku/python"]
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
