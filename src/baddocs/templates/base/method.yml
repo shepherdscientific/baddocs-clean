@@ -1,0 +1,6 @@
+name: "{{ method_name }}"
+type: "method"
+description: "{{ description }}"
+parameters: []
+returns: ""
+visibility: "public"

@@ -1,0 +1,6 @@
+name: "{{ class_name }}"
+type: "class"
+language: "javascript"
+description: "{{ description }}"
+constructors: []
+methods: []

@@ -1,0 +1,5 @@
+name: "{{ function_name }}"
+type: "function"
+description: "{{ description }}"
+parameters: []
+returns: ""

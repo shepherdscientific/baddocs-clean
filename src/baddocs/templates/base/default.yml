@@ -1,0 +1,4 @@
+name: "{{ symbol_name }}"
+type: "{{ symbol_type }}"
+description: "{{ description }}"
+example: "{{ example }}"

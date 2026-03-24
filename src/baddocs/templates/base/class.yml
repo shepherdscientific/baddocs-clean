@@ -1,0 +1,5 @@
+name: "{{ class_name }}"
+type: "class"
+description: "{{ description }}"
+methods: []
+properties: []

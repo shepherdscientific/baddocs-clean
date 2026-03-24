@@ -1,0 +1,18 @@
+# Legacy Code Patterns
+
+patterns:
+  global_variables:
+    description: "Global variable usage"
+    severity: "medium"
+  
+  magic_numbers:
+    description: "Magic numbers in code"
+    severity: "low"
+  
+  goto_statements:
+    description: "GOTO statements"
+    severity: "high"
+  
+  deeply_nested:
+    description: "Deeply nested code"
+    severity: "medium"

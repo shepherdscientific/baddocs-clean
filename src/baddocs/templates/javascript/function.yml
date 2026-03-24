@@ -1,0 +1,7 @@
+name: "{{ function_name }}"
+type: "function"
+language: "javascript"
+description: "{{ description }}"
+parameters: []
+returns: ""
+async: {{ is_async }}

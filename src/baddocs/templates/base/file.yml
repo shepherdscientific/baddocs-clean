@@ -1,0 +1,5 @@
+name: "{{ file_name }}"
+type: "file"
+description: "{{ description }}"
+language: "{{ language }}"
+lines_of_code: {{ loc }}
