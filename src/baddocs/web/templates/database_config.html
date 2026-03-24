@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Configuration - {{ repository_name }}</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f6f8fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 1 px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+        h1 {
+            margin-top: 0;
+            color: #24292f;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #57606a;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #24292f;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0969da;
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background: #0969da;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0860ca;
+        }
+        .btn-secondary {
+            background: #f6f8fa;
+            color: #24292f;
+            border: 1px solid #d0d7de;
+        }
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        .btn-test {
+            background: #1a7f37;
+            color: white;
+        }
+        .btn-test:hover {
+            background: #1a7f37dd;
+        }
+        .btn-danger {
+            background: #cf222e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #a40e26;
+        }
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .message-success {
+            background: #dafbe1;
+            border: 1px solid #2ea44f;
+            color: #1a7f37;
+        }
+        .message-error {
+            background: #ffebe9;
+            border: 1px solid #cf222e;
+            color: #cf222e;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #57606a;
+            margin-top: 4px;
+        }
+        .existing-config {
+            background: #ddf4ff;
+            border: 1px solid #0969da;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .existing-config h3 {
+            margin-top: 0;
+            color: #0969da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Database Configuration</h1>
+        <p class="subtitle">Configure database credentials for <strong>{{ repository_name }}</strong></p>
+
+        {% if message %}
+        <div class="message {{ 'message-success' if message_type == 'success' else 'message-error' }}">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        {% if existing_config %}
+        <div class="existing-config">
+            <h3>Existing Configuration</h3>
+            <p><strong>Database Type:</strong> {{ existing_config.database_type }}</p>
+            <p><strong>Host:</strong> {{ existing_config.host }}:{{ existing_config.port }}</p>
+            <p><strong>Database:</strong> {{ existing_config.database_name }}</p>
+            <p><strong>Username:</strong> {{ existing_config.username }}</p>
+            <p><strong>Last Tested:</strong> {{ existing_config.last_tested_at or 'Never' }}</p>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/github/database-config/{{ repository_id }}">
+            <div class="form-group">
+                <label for="database_type">Database Type</label>
+                <select id="database_type" name="database_type" required>
+                    <option value="">Select database type...</option>
+                    <option value="mysql" {% if existing_config and existing_config.database_type == 'mysql' %}selected{% endif %}>MySQL</option>
+                    <option value="postgresql" {% if existing_config and existing_config.database_type == 'postgresql' %}selected{% endif %}>PostgreSQL</option>
+                    <option value="mssql" {% if existing_config and existing_config.database_type == 'mssql' %}selected{% endif %}>Microsoft SQL Server</option>
+                    <option value="oracle" {% if existing_config and existing_config.database_type == 'oracle' %}selected{% endif %}>Oracle</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="host">Host</label>
+                <input type="text" id="host" name="host" placeholder="prod-db.example.com" value="{{ existing_config.host if existing_config else '' }}" required>
+                <div class="help-text">Database server hostname or IP address</div>
+            </div>
+
+            <div class="form-group">
+                <label for="port">Port</label>
+                <input type="number" id="port" name="port" placeholder="3306" value="{{ existing_config.port if existing_config else '' }}" required>
+                <div class="help-text">Database server port (e.g., 3306 for MySQL, 5432 for PostgreSQL)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="database_name">Database Name</label>
+                <input type="text" id="database_name" name="database_name" placeholder="myapp_db" value="{{ existing_config.database_name if existing_config else '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="readonly_user" value="{{ existing_config.username if existing_config else '' }}" required>
+                <div class="help-text">Use a read-only user for security</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+                <div class="help-text">Password will be encrypted before storage</div>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="ssl_enabled" name="ssl_enabled" value="true" {% if existing_config and existing_config.ssl_enabled %}checked{% endif %}>
+                <label for="ssl_enabled">Enable SSL/TLS connection</label>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-primary">Save Configuration</button>
+                <button type="button" class="btn-test" onclick="testConnection()">Test Connection</button>
+                {% if existing_config %}
+                <button type="button" class="btn-danger" onclick="deleteConfig()">Delete</button>
+                {% endif %}
+                <a href="/github/setup{% if installation_id %}?installation_id={{ installation_id }}{% endif %}"><button type="button" class="btn-secondary">Back</button></a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function testConnection() {
+            const formData = new FormData(document.querySelector('form'));
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('/github/database-config/{{ repository_id }}/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Connection successful!');
+                } else {
+                    alert('Connection failed: ' + result.error);
+                }
+            })
+            .catch(error => {
+                alert('Test failed: ' + error);
+            });
+        }
+
+        function deleteConfig() {
+            if (confirm('Are you sure you want to delete this database configuration?')) {
+                fetch('/github/database-config/{{ repository_id }}', {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        alert('Configuration deleted');
+                        window.location.reload();
+                    } else {
+                        alert('Delete failed: ' + result.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Delete failed: ' + error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
