@@ -1,0 +1,1 @@
+# Implementation Notes\n\nTechnical implementation details for BadDocs components.\n
