@@ -1,0 +1,26 @@
+# =============================================================================
+# Git export rules
+# Files marked export-ignore are excluded from `git archive` outputs
+# (i.e. the ZIP/TAR downloads GitHub generates for releases).
+#
+# BRANCH MERGE POLICY:
+# scripts/ralph/ and prd.json live on the `dev` branch only.
+# When opening a PR from dev -> main, explicitly exclude these paths.
+# They document the internal build process and are not part of the
+# public-facing OSS release.
+# =============================================================================
+
+# Ralph autonomous agent build infrastructure — dev branch only
+scripts/ralph/ export-ignore
+prd.json export-ignore
+
+# Internal development artefacts
+progress.txt export-ignore
+ai-docs/ export-ignore
+
+# Standard generated/cache dirs
+htmlcov/ export-ignore
+.pytest_cache/ export-ignore
+.mypy_cache/ export-ignore
+.ruff_cache/ export-ignore
+*.pyc export-ignore

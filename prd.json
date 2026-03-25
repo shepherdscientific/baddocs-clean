@@ -1,0 +1,115 @@
+{
+  "project": "baddocs",
+  "branchName": "dev",
+  "description": "BadDocs has three fully-built layers (processors, LLM providers, SQLite storage) plus a complete CLI. US-001 through US-015 are complete (156 tests passing). US-016 is the next sprint: migrate environment variable handling from scattered os.getenv() calls to a validated pydantic-settings Settings class, with .env.schema as the source of truth for both varlock validation and settings documentation.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Verify test baseline: all 53 tests pass after applied fixes",
+      "passes": true,
+      "notes": "All 53 tests pass. Fixes: (1) tests/unit/test_cost_tracking.py - 3 float/threshold bugs patched. (2) src/baddocs/mcp_servers/llm/model_router.py - __init__ now calls MockLLMProvider({}), _register_mock_models(), _build_task_mappings() eagerly; _initialize_models() resets self.models = {} first to prevent duplicate entries. (3) src/baddocs/mcp_servers/llm/providers/llamacpp.py - created LlamaCppProvider with llama-server integration. (4) src/baddocs/mcp_servers/llm/providers/base.py - added LLAMACPP to ProviderType enum."
+    },
+    {
+      "id": "US-002",
+      "title": "Fix language detection accuracy",
+      "passes": true,
+      "notes": "Fixed by updating _detect_language_from_extension methods in dependency_analyzer.py, mcp_integration.py, status.py, and generate.py to include all 13 language extensions."
+    },
+    {
+      "id": "US-003",
+      "title": "Wire the end-to-end documentation generation pipeline",
+      "passes": true,
+      "notes": "web/main.py now delegates to ModelRouter. Provider priority: llamacpp > ollama > deepseek/qwen > openai/anthropic."
+    },
+    {
+      "id": "US-004",
+      "title": "Persist generated documentation to SQLite and expose search endpoints",
+      "passes": true,
+      "notes": "storage layer fully wired. GET /api/repositories/{id}/docs and GET /api/repositories/{id}/search endpoints added."
+    },
+    {
+      "id": "US-005",
+      "title": "Add test coverage for CLI and storage to reach the 50% CI threshold",
+      "passes": true,
+      "notes": "All 156 tests pass. Coverage >= 50%."
+    },
+    {
+      "id": "US-006",
+      "title": "Complete and test the llama.cpp provider",
+      "passes": true,
+      "notes": "LlamaCppProvider wired into model_router.py and provider_selector.py. 22 unit tests at tests/unit/test_llamacpp_provider.py."
+    },
+    {
+      "id": "US-007",
+      "title": "Complete GitHub App authentication for private repositories",
+      "passes": true,
+      "notes": "Type annotations fixed. JWT generation, token caching, and rotation wired into git clone. All 156 tests pass."
+    },
+    {
+      "id": "US-008",
+      "title": "End-to-end integration test: full pipeline with mock LLM",
+      "passes": true,
+      "notes": "tests/integration/test_e2e_pipeline.py passes. FTS5 schema fixed. All 156 tests pass."
+    },
+    {
+      "id": "US-009",
+      "title": "Add docker_mode to GitHub Action for standalone OSS use",
+      "passes": true
+    },
+    {
+      "id": "US-010",
+      "title": "Fix security issues in GitHub Action before public release",
+      "passes": true
+    },
+    {
+      "id": "US-011",
+      "title": "Build dist/index.js bundle and add auto-rebuild CI",
+      "passes": true
+    },
+    {
+      "id": "US-012",
+      "title": "Add unit tests for the GitHub Action",
+      "passes": true
+    },
+    {
+      "id": "US-013",
+      "title": "Validate CLI and core pipeline end-to-end against real repos",
+      "passes": true,
+      "notes": "Manual validation story. Results documented in tests/manual/e2e-results.md."
+    },
+    {
+      "id": "US-014",
+      "title": "Clean repo of internal build artefacts before public release",
+      "passes": true
+    },
+    {
+      "id": "US-015",
+      "title": "Tag v1.0.0 and prepare GitHub Marketplace release",
+      "passes": true
+    },
+    {
+      "id": "US-016",
+      "title": "Migrate environment variable handling to pydantic-settings",
+      "description": "As a developer integrating BadDocs, I want all environment variable access centralised in a single validated Settings class so that misconfiguration is caught at startup with clear error messages rather than silently producing wrong behaviour at runtime. The .env.schema file is the canonical documentation of every setting and doubles as the varlock validation schema.",
+      "acceptanceCriteria": [
+        "pydantic-settings>=2.0 is added to pyproject.toml [project] dependencies",
+        "src/baddocs/config/settings.py is created containing a Settings(BaseSettings) class that declares every variable currently read via os.getenv() anywhere in src/baddocs/",
+        "API key fields (DEEPSEEK_API_KEY, QWEN_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, GITHUB_APP_PRIVATE_KEY, GITHUB_WEBHOOK_SECRET, DATABASE_PASSWORD) use pydantic SecretStr type so they are never exposed in repr() or logs",
+        "Numeric fields (PORT, BADDOCS_MONTHLY_BUDGET, GITHUB_APP_ID, DATABASE_PORT) use int or float types with appropriate validators",
+        "Boolean fields (BADDOCS_TRACK_COSTS, BADDOCS_AUTO_DOWNGRADE, MCP_ENABLED) use bool type",
+        "Enum fields (BADDOCS_MVP_TIER, BADDOCS_ROUTING_MODE, BADDOCS_LOG_LEVEL, ENVIRONMENT, DATABASE_TYPE) use Python Enum or Literal types",
+        "Settings.model_config sets env_file='.env', env_file_encoding='utf-8', case_sensitive=False",
+        "A module-level singleton `settings = Settings()` is exported from src/baddocs/config/settings.py",
+        "All os.getenv() and os.environ[] calls in src/baddocs/ are replaced with settings.<field> — grep -r 'os\\.getenv\\|os\\.environ' src/baddocs/ returns 0 results",
+        "load_dotenv() calls are removed from all files except tests that explicitly test env loading",
+        ".env.schema at project root is kept in sync with the Settings class fields — every field in Settings has a matching entry in .env.schema",
+        "A new test file tests/unit/test_settings.py is created covering: (a) default values are correct, (b) SecretStr fields are not exposed in str(settings), (c) invalid BADDOCS_MVP_TIER raises ValidationError, (d) settings loads correctly from a temp .env file",
+        "All existing tests still pass after migration (pytest tests/ exits 0)",
+        "varlock run -- pytest tests/ passes when varlock is installed (document this command in DEVELOPMENT_WORKFLOW.md)"
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": "Run on the dev branch only. Do not merge prd.json or scripts/ralph/ to main — see .gitattributes. After migration, remove the os.getenv usage from this notes field once grep confirms 0 results."
+    }
+  ]
+}
