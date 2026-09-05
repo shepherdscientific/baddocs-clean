@@ -4,12 +4,15 @@ GitHub webhook processing for BadDocs.
 Handles GitHub webhook events, signature verification, and automated documentation generation.
 """
 
+import asyncio
 import logging
+import os
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
 from .auth import GitHubAppAuth
+from .doc_runner import run_docs_job_async
 
 
 @dataclass
@@ -297,10 +300,32 @@ class GitHubWebhookHandler:
 
             self.logger.info(f"Triggering documentation workflow for {repo_full_name} (installation: {event.installation_id})")
 
-            # Return workflow parameters for external processing
-            # In a full implementation, this would trigger the actual workflow
+            # Kick off the incremental hierarchical doc generation as a background
+            # task. The Merkle engine keeps a per-repo store, so each push only
+            # re-documents the files whose blob changed and re-synthesizes just
+            # their ancestor folder/project docs. Generation is blocking and can
+            # take minutes, so it must never run inline in the webhook response.
+            job_started = False
+            if event.event_type == 'push' and config.auto_process_pushes:
+                token = None
+                if event.installation_id is not None:
+                    try:
+                        token = self.github_auth.get_installation_token(event.installation_id)
+                    except Exception as auth_err:  # noqa: BLE001
+                        self.logger.warning(f"Could not get installation token: {auth_err}")
+                hub = os.environ.get("SWARM_HUB") or None
+                model = os.environ.get("BD_MODEL") or None
+                try:
+                    asyncio.get_running_loop().create_task(
+                        self._run_docs_job(repo_url, repo_full_name, commit_sha, token, hub, model)
+                    )
+                    job_started = True
+                except RuntimeError:
+                    # No running loop (sync caller / test): run it inline in a thread-safe way.
+                    self.logger.info("No event loop; skipping background scheduling")
+
             return {
-                'status': 'processed',
+                'status': 'processing_started' if job_started else 'processed',
                 'repository': repo_full_name,
                 'event_type': event.event_type,
                 'changed_files': len(changed_files),
@@ -319,6 +344,22 @@ class GitHubWebhookHandler:
                 'event_type': event.event_type,
                 'repository': event.repository.get('full_name', 'unknown')
             }
+
+    async def _run_docs_job(self, clone_url: str, repo_full_name: str,
+                            commit_sha: str | None, token: str | None,
+                            hub: str | None, model: str | None) -> None:
+        """Background wrapper: run the incremental hierarchical doc generation and log the outcome."""
+        try:
+            result = await run_docs_job_async(clone_url, repo_full_name, commit_sha, token, hub, model)
+            self.logger.info(
+                "Docs job for %s: status=%s regenerated=%d reused=%d resynthesized=%d",
+                repo_full_name, result.status, len(result.regenerated), result.reused,
+                len(result.resynthesized),
+            )
+            if result.error:
+                self.logger.error("Docs job error for %s: %s", repo_full_name, result.error)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error("Docs job crashed for %s: %s", repo_full_name, e)
 
     def create_status_check(self, event: WebhookEvent, state: str, description: str, target_url: str | None = None) -> bool:
         """
