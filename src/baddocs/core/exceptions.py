@@ -15,3 +15,7 @@ class AnalysisError(BadDocsException):
 class StorageError(BadDocsException):
     """Storage error."""
     pass
+
+class ProcessingError(BadDocsException):
+    """Raised when file processing fails."""
+    pass
