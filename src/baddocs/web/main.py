@@ -324,7 +324,8 @@ def _detect_language_from_extension_for_pipeline(extension: str) -> str:
         '.f': 'fortran', '.f77': 'fortran', '.f90': 'fortran', '.f95': 'fortran', '.for': 'fortran', '.ftn': 'fortran',
         '.bas': 'vb6', '.frm': 'vb6', '.cls': 'vb6', '.ctl': 'vb6', '.pag': 'vb6', '.dob': 'vb6', '.vb': 'vb6',
         '.pbl': 'powerbuilder', '.pbt': 'powerbuilder', '.pbw': 'powerbuilder', '.srd': 'powerbuilder', '.sru': 'powerbuilder', '.srw': 'powerbuilder', '.pbd': 'powerbuilder',
-        '.r': 'r', '.R': 'r', '.Rmd': 'r', '.Rnw': 'r', '.Rscript': 'r'
+        '.r': 'r', '.R': 'r', '.Rmd': 'r', '.Rnw': 'r', '.Rscript': 'r',
+        '.v': 'verilog', '.vh': 'verilog', '.sv': 'verilog', '.svh': 'verilog', '.svi': 'verilog',
     }
     return extension_map.get(extension, 'unknown')
 
@@ -334,7 +335,8 @@ def _get_processor_for_language(language: str, config: Dict[str, Any]):
     from ..processors import (
         PythonProcessor, JavaScriptProcessor, JavaProcessor, CSharpProcessor,
         GoProcessor, RubyProcessor, RustProcessor, PHPProcessor,
-        CobolProcessor, FortranProcessor, VB6Processor, PowerBuilderProcessor, RProcessor
+        CobolProcessor, FortranProcessor, VB6Processor, PowerBuilderProcessor, RProcessor,
+        VerilogProcessor
     )
 
     language_to_processor = {
@@ -352,6 +354,7 @@ def _get_processor_for_language(language: str, config: Dict[str, Any]):
         'vb6': VB6Processor,
         'powerbuilder': PowerBuilderProcessor,
         'r': RProcessor,
+        'verilog': VerilogProcessor,
     }
     processor_class = language_to_processor.get(language.lower())
     if processor_class:
@@ -2195,6 +2198,7 @@ async def _analyze_repository_mcp_async(repo_id: str, repository_url: str, analy
             '.bas', '.frm', '.cls', '.ctl', '.pag', '.dob', '.vb',  # VB6
             '.pbl', '.pbt', '.pbw', '.srd', '.sru', '.srw', '.pbd',  # PowerBuilder
             '.r', '.R', '.Rmd', '.Rnw', '.Rscript',  # R
+            '.v', '.vh', '.sv', '.svh', '.svi',  # Verilog / SystemVerilog
         }
 
         files_to_process = []
@@ -2654,7 +2658,8 @@ This directory contains automatically generated documentation for the repository
             # Get list of files to process
             file_extensions = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript',
                              '.java': 'java', '.cs': 'csharp', '.sql': 'sql',
-                             '.php': 'php', '.rb': 'ruby', '.go': 'go', '.rs': 'rust'}
+                             '.php': 'php', '.rb': 'ruby', '.go': 'go', '.rs': 'rust',
+                             '.v': 'verilog', '.sv': 'verilog', '.vh': 'verilog', '.svh': 'verilog'}
 
             files_to_process = []
             for ext, language in file_extensions.items():
