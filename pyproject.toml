@@ -7,10 +7,24 @@ name = "baddocs"
 version = "1.0.0"
 description = "AI-powered documentation generation for legacy codebases"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "Shepherd Scientific"}]
-keywords = ["documentation", "legacy-code", "ai", "analysis"]
+keywords = ["documentation", "hardware", "rtl", "verilog", "incremental", "local-llm", "ai"]
+
+dependencies = [
+    "click>=8.0",
+    "python-dotenv>=1.0",
+    "fastapi>=0.100",
+    "uvicorn[standard]>=0.23",
+    "httpx>=0.24",
+    "jinja2>=3.1",
+    "PyJWT>=2.6",
+    "pydantic>=2.0",
+    "requests>=2.28",
+    "SQLAlchemy>=2.0",
+    "PyYAML>=6.0",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -25,8 +39,14 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["baddocs"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+baddocs = "baddocs.cli.main:cli"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=baddocs --cov-report=html --cov-report=term-missing"
+addopts = "-p no:cacheprovider"

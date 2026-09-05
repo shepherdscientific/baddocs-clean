@@ -119,7 +119,7 @@ def build_callbacks(target: str, docs_dir: str, project_name: str,
 
 def generate_hierarchical_docs(repo: str, storage_path: Optional[str] = None,
                                docs_dir: str = "bd-docs", hub: str = DEFAULT_HUB,
-                               model: str = DEFAULT_MODEL):
+                               model: str = DEFAULT_MODEL, max_workers: int = 1):
     """Run one incremental hierarchical generation over ``repo``.
 
     Returns the engine's :class:`IncrementalRunResult` (``noop``, ``regenerated``,
@@ -132,4 +132,5 @@ def generate_hierarchical_docs(repo: str, storage_path: Optional[str] = None,
     storage = storage_path or os.path.join(target, ".baddocs-merkle")
     project_name = os.path.basename(target.rstrip("/"))
     generator, synthesizer = build_callbacks(target, docs_abs, project_name, hub, model)
-    return run_incremental(target, storage, generator, synthesizer, path_filter=code_path_filter)
+    return run_incremental(target, storage, generator, synthesizer,
+                           path_filter=code_path_filter, max_workers=max_workers)

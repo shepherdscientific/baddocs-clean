@@ -9,6 +9,38 @@ BadDocs clones a GitHub repository, detects the language of every source file, r
 
 ---
 
+## Project status
+
+BadDocs is under active development. To set honest expectations, here is what is
+real today versus in progress:
+
+**Working and tested:**
+- **Incremental hierarchical generation** — a content-keyed Merkle tree
+  (`baddocs.incremental`) documents `unit (file) → folder → repo/project`.
+  On each run only files whose git blob changed are re-documented and only their
+  ancestor folder/project docs are re-synthesized; an unchanged run is a
+  zero-LLM no-op. Optional parallel unit generation fans out across a local
+  model fleet (`--workers`).
+- **Verilog / SystemVerilog processor** — real structural extraction (modules,
+  ports with direction/width/signedness, parameters, submodule instances).
+- **Local-first LLM** via any OpenAI-compatible endpoint (llama.cpp, Ollama, a
+  LiteLLM hub). Your code never leaves your environment.
+- **CLI** — `baddocs generate <repo>` and the incremental engine.
+- **GitHub App webhook handler** — a push schedules an incremental doc job
+  (`baddocs.web.github`).
+
+**In progress / known limitations:**
+- The non-Verilog language processors are **prose-only stubs** today: the LLM
+  writes docs from source, but they do not yet extract structure. (So "13
+  languages" means 13 file types are *recognized*; only Verilog has a real
+  structural pass.)
+- The FastAPI web server (`baddocs.web.main`) does **not** import yet — it
+  depends on a `baddocs.config.providers_simple` provider layer that is not in
+  this tree. Use the CLI / `baddocs.incremental` engine directly for now.
+- Built-in full-text search is not wired in this build.
+
+---
+
 ## ☁️ BadDocs Cloud
 
 The fastest way to get started is **[BadDocs Cloud](https://baddocs.io)** — no setup, no API keys, no infrastructure.
@@ -25,7 +57,7 @@ Self-hosting? Keep reading.
 
 ## Features
 
-- **13 language processors** — Python, JavaScript/TypeScript, Java, C#, Go, Ruby, Rust, PHP, COBOL, Fortran, VB6, PowerBuilder, R
+- **Verilog / SystemVerilog** — real structural extraction (the flagship processor). Python and 12 other file types are recognized and documented as prose (structural extraction in progress — see Project status)
 - **Local-first LLM support** — llama.cpp (`llama-server`) and Ollama work out of the box with no API keys required
 - **Cloud LLM fallback** — DeepSeek, Qwen, OpenAI, Anthropic with automatic cost-tier routing
 - **Incremental analysis** — only re-processes files that changed since the last run

@@ -358,7 +358,7 @@ def _get_processor_for_language(language: str, config: Dict[str, Any]):
     }
     processor_class = language_to_processor.get(language.lower())
     if processor_class:
-        return processor_class(config)
+        return processor_class()
     return None
 
 

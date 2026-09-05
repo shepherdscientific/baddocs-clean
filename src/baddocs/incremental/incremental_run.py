@@ -110,6 +110,7 @@ def run_incremental(
     path_filter: Optional[PathFilter] = None,
     logger: Optional[logging.Logger] = None,
     budget: Optional[CostBudget] = None,
+    max_workers: int = 1,
 ) -> IncrementalRunResult:
     """
     Run one incremental doc generation, short-circuiting when there's no work.
@@ -170,8 +171,11 @@ def run_incremental(
     synth = synthesizer if budget is None else budgeted(synthesizer, budget)
 
     # --- Work: regenerate stale leaves, then re-synthesize stale ancestors --
+    # Parallel unit generation only when there is no cost ceiling: the budget
+    # path must charge calls in order so it can stop before the breaching call.
+    unit_workers = 1 if budget is not None else max_workers
     try:
-        regen = regenerate_units(repo_p, stale, gen, storage_p)
+        regen = regenerate_units(repo_p, stale, gen, storage_p, max_workers=unit_workers)
 
         # Build the current Merkle tree from the same (filtered) leaf set the
         # plan was computed from, so the persisted tree matches what the next run

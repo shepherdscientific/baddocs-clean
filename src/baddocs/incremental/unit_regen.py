@@ -167,6 +167,7 @@ def regenerate_units(
     stale_set: StaleSet,
     generator: UnitDocGenerator,
     storage_path: PathLike,
+    max_workers: int = 1,
 ) -> RegenResult:
     """
     Regenerate unit docs for stale leaves only; reuse cached docs otherwise.
@@ -198,9 +199,23 @@ def regenerate_units(
 
     # Spend an LLM call only on stale leaves. Sorted for deterministic order.
     regenerated: Set[str] = set()
-    for path in sorted(stale_set.stale_leaves):
-        store.save_doc(repo, path, generator(path))
-        regenerated.add(path)
+    stale = sorted(stale_set.stale_leaves)
+    if max_workers and max_workers > 1 and len(stale) > 1:
+        # Unit docs are independent, so fan the (IO-bound) generator calls out
+        # across the model fleet -- the hub load-balances concurrent requests
+        # over the available machines. ``map`` preserves order and re-raises
+        # any generator exception. Saves stay in this thread (single writer).
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=max_workers) as pool:
+            docs_by_path = dict(zip(stale, pool.map(generator, stale)))
+        for path in stale:
+            store.save_doc(repo, path, docs_by_path[path])
+            regenerated.add(path)
+    else:
+        for path in stale:
+            store.save_doc(repo, path, generator(path))
+            regenerated.add(path)
 
     # The merged current set = freshly regenerated docs + untouched cached docs.
     docs = store.all_docs(repo)
