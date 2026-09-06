@@ -34,9 +34,10 @@ real today versus in progress:
   writes docs from source, but they do not yet extract structure. (So "13
   languages" means 13 file types are *recognized*; only Verilog has a real
   structural pass.)
-- The FastAPI web server (`baddocs.web.main`) does **not** import yet — it
-  depends on a `baddocs.config.providers_simple` provider layer that is not in
-  this tree. Use the CLI / `baddocs.incremental` engine directly for now.
+- The FastAPI web server (`baddocs.web.main`) runs against a single
+  OpenAI-compatible endpoint configured via env (`AI_BASE_URL` / `AI_MODEL` /
+  `AI_API_KEY`; works with OpenAI, OpenRouter, a local llama.cpp/Ollama, or a
+  LiteLLM hub). The richer multi-provider/model-router layer is not shipped here.
 - Built-in full-text search is not wired in this build.
 
 ---
