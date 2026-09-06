@@ -192,8 +192,11 @@ async def lifespan(app: FastAPI):
         registry = await app_state["config_manager"].create_registry_for_mvp(mvp_tier)
         app_state["registry"] = registry
 
-        # Initialize MCP integration if available
-        if HAS_MCP_SUPPORT:
+        # Initialize MCP integration only when an orchestrator is explicitly
+        # configured. Without this guard, startup blocks on retry/backoff trying
+        # to reach a nonexistent orchestrator (localhost:8001). The core server
+        # (docs generation, /api/try-it, webhook) does not require MCP.
+        if HAS_MCP_SUPPORT and os.getenv("MCP_ORCHESTRATOR_URL"):
             try:
                 mcp_orchestrator_url = os.getenv("MCP_ORCHESTRATOR_URL", "http://localhost:8001")
                 print(f"DEBUG: MCP_ORCHESTRATOR_URL from env: {mcp_orchestrator_url}")

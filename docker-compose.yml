@@ -32,7 +32,14 @@ services:
     environment:
       DATABASE_URL: postgresql://baddocs:baddocs@db:5432/baddocs
       REDIS_URL: redis://redis:6379/0
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # Inference endpoint (OpenAI-compatible). Point at a budgeted endpoint for
+      # a public demo. See .env.example.
+      AI_PROVIDER: ${AI_PROVIDER:-openai}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      AI_API_KEY: ${AI_API_KEY:-}
+      BADDOCS_TRY_MAX_FILES: ${BADDOCS_TRY_MAX_FILES:-6}
+      BADDOCS_TRY_CLONE_TIMEOUT: ${BADDOCS_TRY_CLONE_TIMEOUT:-60}
     ports:
       - "8000:8000"
     depends_on:
