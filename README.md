@@ -42,17 +42,11 @@ real today versus in progress:
 
 ---
 
-## ☁️ BadDocs Cloud
+## ☁️ Hosted version
 
-The fastest way to get started is **[BadDocs Cloud](https://baddocs.io)** — no setup, no API keys, no infrastructure.
-
-- **Free tier**: 3 analyses/month, up to 30 files each
-- **Pro ($29/mo)**: 500 files, private repos, API access, clean exports
-- **Team ($79/mo)**: 2,000 files, unlimited analyses, 5 seats
-
-[**→ Try BadDocs Cloud free**](https://baddocs.io/signup) · [See a live demo on WordPress](https://baddocs.io/demo)
-
-Self-hosting? Keep reading.
+A managed, hosted version is available at **[baddocs.io](https://baddocs.io)** —
+no setup, no API keys, no infrastructure. Everything below is for self-hosting
+the open-source engine.
 
 ---
 
