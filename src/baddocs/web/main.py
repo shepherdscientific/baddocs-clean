@@ -379,6 +379,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Public "try it free" demo endpoint (capped hierarchical generation). The hosted
+# product must gate this with Turnstile / grit-auth / quotas; here it enforces
+# only technical caps. Best-effort mount so a missing dep never breaks startup.
+try:
+    from .try_it import router as _try_it_router
+    app.include_router(_try_it_router)
+except Exception as _e:  # noqa: BLE001
+    logging.getLogger(__name__).warning(f"try-it endpoint not mounted: {_e}")
+
 # Logging setup
 logging.basicConfig(
     level=getattr(logging, os.getenv("BADDOCS_LOG_LEVEL", "INFO")),
